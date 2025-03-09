@@ -1,0 +1,5 @@
+# byte compiled
+__pycache__
+
+# ide's
+.idea/
