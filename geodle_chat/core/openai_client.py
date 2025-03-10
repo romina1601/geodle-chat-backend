@@ -9,7 +9,7 @@ if not api_key:
 
 client = AsyncOpenAI(api_key=api_key)
 
-async def generate_answer_stream(conversation: list, model: str = "gpt-3.5-turbo", temperature: float = 0.7) -> str:
+async def generate_answer_stream(conversation: list, model: str = "gpt-4o-mini", temperature: float = 1) -> str:
     response = await client.chat.completions.create(
         model=model,
         messages=conversation,
