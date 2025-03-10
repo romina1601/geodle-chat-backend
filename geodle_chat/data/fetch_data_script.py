@@ -15,7 +15,7 @@ def fetch_all_countries():
     countries = [country["name"]["common"] for country in response.json()]
 
     # Save country names to a JSON file
-    with open("geodle_chat_backend/data/countries.json", "w") as f:
+    with open("geodle_chat/data/countries.json", "w") as f:
         json.dump(countries, f, indent=4)
 
     print(f"Saved {len(countries)} countries to JSON.")

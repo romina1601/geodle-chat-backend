@@ -1,6 +1,6 @@
 from openai import AsyncOpenAI
 
-from geodle_chat_backend.core.config import settings
+from geodle_chat.core.config import settings
 
 api_key = settings.OPENAI_API_KEY
 

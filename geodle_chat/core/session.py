@@ -4,8 +4,8 @@ import random
 
 session_store = {}
 
-DAILY_COUNTRY_FILE = "geodle_chat_backend/data/daily_country.json"
-COUNTRIES_FILE = "geodle_chat_backend/data/countries.json"
+DAILY_COUNTRY_FILE = "geodle_chat/data/daily_country.json"
+COUNTRIES_FILE = "geodle_chat/data/countries.json"
 
 def select_daily_country():
     """Selects a random country for the day and stores it in a JSON file."""

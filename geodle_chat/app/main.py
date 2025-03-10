@@ -1,7 +1,7 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-from geodle_chat_backend.api.endpoints import router
+from geodle_chat.api.endpoints import router
 
 app = FastAPI(title="Geodle Chat Backend")
 

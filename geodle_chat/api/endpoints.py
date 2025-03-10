@@ -3,10 +3,10 @@ import uuid
 from fastapi import APIRouter, HTTPException, Request, Response
 from starlette.responses import StreamingResponse
 
-from geodle_chat_backend.core.data_fetcher import fetch_country_details, retrieve_facts_from_json
-from geodle_chat_backend.core.session import session_store, select_daily_country
-from geodle_chat_backend.models.question import QuestionRequest
-from geodle_chat_backend.core.openai_client import generate_answer_stream
+from geodle_chat.core.data_fetcher import fetch_country_details, retrieve_facts_from_json
+from geodle_chat.core.session import session_store, select_daily_country
+from geodle_chat.models.question import QuestionRequest
+from geodle_chat.core.openai_client import generate_answer_stream
 
 router = APIRouter()
 
