@@ -3,3 +3,6 @@ __pycache__
 
 # ide's
 .idea/
+
+# sensitive info
+.env
