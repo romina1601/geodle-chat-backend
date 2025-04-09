@@ -8,7 +8,20 @@ DATA_DIR = os.path.join(ROOT_DIR, "data/jsons")
 os.makedirs(DATA_DIR, exist_ok=True)
 
 def fetch_country_details(country_name: str) -> {}:
-    """Fetches details about a country from REST Countries API and stores them as JSON."""
+    """Fetches details about a country either from:
+        - REST Countries API and stores them as JSON.
+        - local JSON file if it was already fetched from the REST API
+    """
+    # Normalize file name: lowercased and underscores instead of spaces
+    filename = f"{country_name.lower().replace(' ', '_')}.json"
+    filepath = os.path.join(DATA_DIR, filename)
+
+    # If the file exists, load and return it
+    if os.path.exists(filepath):
+        with open(filepath, "r", encoding="utf-8") as f:
+            print(f"Reading country data from {filepath}")
+            return json.load(f)
+
     api_url = f"https://restcountries.com/v3.1/name/{country_name}?fullText=true"
     response = requests.get(api_url)
 
@@ -29,9 +42,8 @@ def fetch_country_details(country_name: str) -> {}:
     }
 
     # Save the details to a JSON file for future retrieval
-    file_path = os.path.join(DATA_DIR, f"{country_name}.json")
-    with open(file_path, "w") as f:
-        json.dump(details, f, indent=4)
+    with open(filepath, "w") as f:
+        json.dump(details, f, ensure_ascii=False, indent=2)
 
     return details
 
