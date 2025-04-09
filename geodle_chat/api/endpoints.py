@@ -22,21 +22,26 @@ async def start_game():
 
     country_facts = fetch_country_details(secret_country)   # Get country details for daily country
 
-    # Session data
     conversation =[{
         "role": "system",
         "content": f"You are playing a game with a user. You are thinking of a country, "
          f"{secret_country}, and the user will ask you questions to try and guess it."
          f"Do not give it away too easily. Country context: {country_facts}."
          f"The user can ask yes/no questions and open questions as well."
+         f"Be as short and concise as possible when answering."
          f"Make sure that when you give hints you don't disclose the country."
-         f"While giving hints, don't say the full name or part of the name of the country."
+         f"You can't disclose the capital name, but you can disclose other big cities' name if you're asked to."
+         f"While giving hints, don't say the full name or part of the name of the country!!!"
+         f"Be careful if you're asked for currency, you can say the currency abbreviation, but do not disclose part of the country name "
+         f"(example don't say Romanian Leu, cause they will know it Romania; but you can say it has Leu in its name)."
          f"When the user asks a question, if it appears to be a guess (for example, "
          f"phrases like 'Is it the UK?', 'I guess it's Italy', or similar natural language guesses), compare the guess with "
          f"the secret country (which you know from the context). If the guess is correct (even if it contains extra words or "
-         f"typos), respond with 'Correct! The country is [secret_country]! Come back again tomorrow!' and do not provide further hints."
-         f"You have to strictly use this format, not other variations. "
+         f"typos), respond with 'Correct! The country is [secret_country] [secret_country_flag_emoji]! Come back again tomorrow!' "
+         f"and do not provide further hints."
+         f"You have to strictly use this format, not other variations. And don't forget to put the correct flag as emoji! "
          f"If the guess is not correct, provide a helpful hint based on the country context."}]
+    # Session data
 
     session_store[session_id] = {
         "conversation": conversation,
