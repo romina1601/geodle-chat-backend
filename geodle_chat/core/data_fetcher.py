@@ -31,14 +31,15 @@ def fetch_country_details(country_name: str) -> {}:
     country_data = response.json()[0]  # Extract first match
 
     details = {
-        "Name": country_data.get("name", {}).get("common", "Unknown"),
-        "Capital": country_data.get("capital", ["Unknown"])[0],
-        "Region": country_data.get("region", "Unknown"),
-        "Subregion": country_data.get("subregion", "Unknown"),
-        "Population": country_data.get("population", "Unknown"),
-        "Currency": ", ".join(country_data.get("currencies", {}).keys()),
-        "Languages": ", ".join(country_data.get("languages", {}).values()),
-        "Borders": ", ".join(country_data.get("borders", [])) if country_data.get("borders") else "None",
+        "name": country_data.get("name", {}).get("common", "Unknown"),
+        "capital": country_data.get("capital", ["Unknown"])[0],
+        "region": country_data.get("region", "Unknown"),
+        "subregion": country_data.get("subregion", "Unknown"),
+        "population": country_data.get("population", "Unknown"),
+        "currency": ", ".join(country_data.get("currencies", {}).keys()),
+        "languages": ", ".join(country_data.get("languages", {}).values()),
+        "flag": country_data.get("flag", ""),
+        "borders": ", ".join(country_data.get("borders", [])) if country_data.get("borders") else "None",
     }
 
     # Save the details to a JSON file for future retrieval

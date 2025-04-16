@@ -37,7 +37,7 @@ async def start_game():
          f"When the user asks a question, if it appears to be a guess (for example, "
          f"phrases like 'Is it the UK?', 'I guess it's Italy', or similar natural language guesses), compare the guess with "
          f"the secret country (which you know from the context). If the guess is correct (even if it contains extra words or "
-         f"typos), respond with 'Correct! The country is [secret_country] [secret_country_flag_emoji]! Come back again tomorrow!' "
+         f"typos), respond with 'Correct! The country is [secret_country] {country_facts['flag']}! Come back again tomorrow!' "
          f"and do not provide further hints."
          f"You have to strictly use this format, not other variations. And don't forget to put the correct flag as emoji! "
          f"If the guess is not correct, provide a helpful hint based on the country context."}]
