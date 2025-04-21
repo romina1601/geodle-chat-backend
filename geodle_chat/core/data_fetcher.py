@@ -2,6 +2,10 @@ import requests
 import json
 import os
 
+from geodle_chat.utils.logger import setup_logger
+
+logger = setup_logger(__name__)
+
 ROOT_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 DATA_DIR = os.path.join(ROOT_DIR, "data/jsons")
 
@@ -26,7 +30,8 @@ def fetch_country_details(country_name: str) -> {}:
     response = requests.get(api_url)
 
     if response.status_code != 200:
-        return "Country details could not be fetched."
+        logger.error("Country details could not be fetched.")
+        return None
 
     country_data = response.json()[0]  # Extract first match
 
