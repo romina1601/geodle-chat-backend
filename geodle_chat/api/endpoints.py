@@ -3,7 +3,7 @@ import uuid
 from fastapi import APIRouter, HTTPException, Request
 from starlette.responses import StreamingResponse
 
-from geodle_chat.core.data_fetcher import fetch_country_details, retrieve_facts_from_json
+from geodle_chat.core.data_fetcher import fetch_country_details, retrieve_facts_from_json, logger
 from geodle_chat.core.session import select_daily_country, session_store
 from geodle_chat.models.question import QuestionRequest
 from geodle_chat.core.openai_client import generate_answer_stream
@@ -21,6 +21,8 @@ async def start_game():
     secret_country = select_daily_country()
 
     country_facts = fetch_country_details(secret_country)   # Get country details for daily country
+    country_flag = None if not country_facts else country_facts['flag']
+    logger.info(f'Country facts for {secret_country}: {country_facts}')
 
     conversation =[{
         "role": "system",
@@ -37,12 +39,12 @@ async def start_game():
          f"When the user asks a question, if it appears to be a guess (for example, "
          f"phrases like 'Is it the UK?', 'I guess it's Italy', or similar natural language guesses), compare the guess with "
          f"the secret country (which you know from the context). If the guess is correct (even if it contains extra words or "
-         f"typos), respond with 'Correct! The country is [secret_country] {country_facts['flag']}! Come back again tomorrow!' "
+         f"typos), respond with 'Correct! The country is [secret_country] {country_flag}! Come back again tomorrow!' "
          f"and do not provide further hints."
          f"You have to strictly use this format, not other variations. And don't forget to put the correct flag as emoji! "
          f"If the guess is not correct, provide a helpful hint based on the country context."}]
-    # Session data
 
+    # Session data
     session_store[session_id] = {
         "conversation": conversation,
         "secret_country": secret_country
