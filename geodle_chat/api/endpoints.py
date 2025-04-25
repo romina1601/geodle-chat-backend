@@ -5,7 +5,8 @@ from starlette.responses import StreamingResponse
 
 from geodle_chat.core.data_fetcher import fetch_country_details, retrieve_facts_from_json, logger
 from geodle_chat.core.session import select_daily_country, session_store
-from geodle_chat.models.question import QuestionRequest
+from geodle_chat.llm.prompts import build_system_prompt
+from geodle_chat.models.chat import QuestionRequest, ValidationInput
 from geodle_chat.core.openai_client import generate_answer_stream
 
 router = APIRouter()
@@ -26,23 +27,9 @@ async def start_game():
 
     conversation =[{
         "role": "system",
-        "content": f"You are playing a game with a user. You are thinking of a country, "
-         f"{secret_country}, and the user will ask you questions to try and guess it."
-         f"Do not give it away too easily. Country context: {country_facts}."
-         f"The user can ask yes/no questions and open questions as well."
-         f"Be as short and concise as possible when answering."
-         f"Make sure that when you give hints you don't disclose the country."
-         f"You can't disclose the capital name, but you can disclose other big cities' name if you're asked to."
-         f"While giving hints, don't say the full name or part of the name of the country!!!"
-         f"Be careful if you're asked for currency, you can say the currency abbreviation, but do not disclose part of the country name "
-         f"(example don't say Romanian Leu, cause they will know it Romania; but you can say it has Leu in its name)."
-         f"When the user asks a question, if it appears to be a guess (for example, "
-         f"phrases like 'Is it the UK?', 'I guess it's Italy', or similar natural language guesses), compare the guess with "
-         f"the secret country (which you know from the context). If the guess is correct (even if it contains extra words or "
-         f"typos), respond with 'Correct! The country is [secret_country] {country_flag}! Come back again tomorrow!' "
-         f"and do not provide further hints."
-         f"You have to strictly use this format, not other variations. And don't forget to put the correct flag as emoji! "
-         f"If the guess is not correct, provide a helpful hint based on the country context."}]
+        "content": build_system_prompt(secret_country=secret_country, country_facts=country_facts,
+                                       country_flag=country_flag)
+    }]
 
     # Session data
     session_store[session_id] = {
@@ -53,7 +40,6 @@ async def start_game():
     return {
         "session_id": session_id,
         "message": "I am thinking of a country... Can you guess it? 🗺️",
-        "secret_country": secret_country,  # TODO: Debugging only, remove later
     }
 
 # Ask Question endpoint. "Stream" refers to how the response is received, i.e. as stream of chunks
@@ -85,3 +71,26 @@ async def ask_question_stream(data: QuestionRequest, request: Request):
         return StreamingResponse(stream_generator(), media_type="text/event-stream")
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
+
+
+@router.post("/validate")
+def validate_answer(data: ValidationInput, request: Request):
+    session_id = request.headers.get("X-Session-ID")
+    if not session_id or session_id not in session_store:
+        raise HTTPException(status_code=400, detail="Session not found. Please start a new game.")
+
+    # Get session data
+    session_data = session_store[session_id]
+    secret_country = session_data["secret_country"]
+
+    full_response = data.full_answer.lower()
+    country_lower = secret_country.lower()
+    logger.info(f'Validating AI response: {full_response}')
+
+    is_game_over = (
+            "correct" in full_response and
+            "the country is" in full_response and
+            country_lower in full_response
+    )
+
+    return {"is_game_over": is_game_over}
