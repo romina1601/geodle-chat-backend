@@ -48,7 +48,7 @@ def fetch_country_details(country_name: str) -> {}:
     }
 
     # Save the details to a JSON file for future retrieval
-    with open(filepath, "w") as f:
+    with open(filepath, "w", encoding="utf-8") as f:
         json.dump(details, f, ensure_ascii=False, indent=2)
 
     return details
@@ -62,7 +62,7 @@ def retrieve_facts_from_json(country: str) -> str:
     if not os.path.exists(file_path):
         return "No additional facts found."
 
-    with open(file_path, "r") as f:
+    with open(file_path, "r", encoding="utf-8") as f:
         country_data = json.load(f)
 
     # Format facts as a readable text string
