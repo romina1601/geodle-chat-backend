@@ -1,6 +1,10 @@
 import datetime
+import hashlib
 import json
+import os
 import random
+
+from geodle_chat.core.data_fetcher import logger
 
 session_store = {}
 
@@ -8,28 +12,38 @@ DAILY_COUNTRY_FILE = "geodle_chat/data/daily_country.json"
 COUNTRIES_FILE = "geodle_chat/data/countries.json"
 
 def select_daily_country():
-    """Selects a random country for the day and stores it in a JSON file."""
+    """Deterministically picks a country based on today's date and appends it to history."""
     today = datetime.date.today().isoformat()  # "YYYY-MM-DD"
 
-    # Load history of picked countries (if exists)
-    try:
-        with open(DAILY_COUNTRY_FILE, "r") as f:
-            countries_history = json.load(f)
-    except (FileNotFoundError, json.JSONDecodeError):
+    with open(COUNTRIES_FILE, "r") as f:
+        countries = json.load(f)
+
+    # Load existing daily country history
+    if os.path.exists(DAILY_COUNTRY_FILE):
+        try:
+            with open(DAILY_COUNTRY_FILE, "r") as f:
+                countries_history = json.load(f)
+        except json.JSONDecodeError:
+            countries_history = []
+    else:
         countries_history = []
 
-    # Check if today's country is already selected
     for entry in countries_history:
         if entry["date"] == today:
             return entry["country"]
 
-    # Select a new country from the countries list and add it to the selected countries file
-    with open(COUNTRIES_FILE, "r") as f:
-        countries = json.load(f)
+    # Select today's country deterministically
+    seed = int(hashlib.sha256(today.encode('utf-8')).hexdigest(), 16)
+    random.seed(seed)
     daily_country = random.choice(countries)
-    countries_history.append({"date": today, "country": daily_country})
+    logger.info(f"Today\'s secret country is: {daily_country}")
 
-    # Update the history of picked countries with today's daily country
+    # Append today's country to history
+    countries_history.append({
+        "date": today,
+        "country": daily_country
+    })
+
     with open(DAILY_COUNTRY_FILE, "w") as f:
         json.dump(countries_history, f, indent=4)
 
