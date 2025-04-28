@@ -15,6 +15,7 @@ SYSTEM_PROMPT = """
     (which you know from the context). If the guess is correct (even if it contains extra words or typos), 
     respond with 'Correct! The country is [secret_country] {country_flag}! Come back again tomorrow!' and do not provide further hints.
     You have to strictly use this format, not other variations. And don't forget to put the correct flag as emoji! 
+    ONLY for the *winning message*, make sure you use the full country name, exactly as it was given to you, eg. United States of America, Republic of the Congo, etc., NO abbreviations!
     If the guess is not correct, provide a helpful hint based on the country context."
 """
 
