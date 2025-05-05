@@ -26,7 +26,7 @@ async def start_game():
     logger.info(f'Country facts for {secret_country}: {country_facts}')
 
     conversation =[{
-        "role": "system",
+        "role": "developer",
         "content": build_system_prompt(secret_country=secret_country, country_facts=country_facts,
                                        country_flag=country_flag)
     }]
@@ -55,7 +55,7 @@ async def ask_question_stream(data: QuestionRequest, request: Request):
     secret_country = session_data["secret_country"]
 
     country_facts = retrieve_facts_from_json(secret_country)
-    conversation.append({"role": "system", "content": f"Additional information: {country_facts}"})
+    conversation.append({"role": "developer", "content": f"Additional information: {country_facts}"})
 
     # Add new question
     conversation.append({"role": "user", "content": data.question})
