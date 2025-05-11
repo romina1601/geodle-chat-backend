@@ -1,13 +1,18 @@
+import json
+import os
 import uuid
+from datetime import datetime
 
 from fastapi import APIRouter, HTTPException, Request
 from starlette.responses import StreamingResponse
 
+from geodle_chat.core.config import SESSION_LOGS_DIR
 from geodle_chat.core.data_fetcher import fetch_country_details, retrieve_facts_from_json, logger
 from geodle_chat.core.session import select_daily_country, session_store
 from geodle_chat.llm.prompts import build_system_prompt
 from geodle_chat.models.chat import QuestionRequest, ValidationInput
 from geodle_chat.core.openai_client import generate_answer_stream
+from geodle_chat.models.session import SessionLogEntry
 
 router = APIRouter()
 
@@ -94,3 +99,21 @@ def validate_answer(data: ValidationInput, request: Request):
     )
 
     return {"is_game_over": is_game_over}
+
+@router.post("/log-session")
+async def log_session(entry: SessionLogEntry):
+    date_str = datetime.now().strftime("%Y-%m-%d")
+    log_path = os.path.join(SESSION_LOGS_DIR, f"{date_str}.json")
+
+    if os.path.exists(log_path):
+        with open(log_path, "r") as f:
+            data = json.load(f)
+    else:
+        data = {}
+
+    if entry.session_id not in data:
+        data[entry.session_id] = entry.time
+        with open(log_path, "w") as f:
+            json.dump(data, f, indent=2)
+
+    return {"status": "ok"}
